@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeremiah: The 70 Years of Exile | Interactive Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom Font Assignments */
+        body { font-family: 'Lato', sans-serif; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Cinzel', serif; }
+        
+        /* Chart Container Styling (Mandatory) */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (max-width: 640px) {
+            .chart-container {
+                height: 250px;
+            }
+        }
+
+        /* Custom Scrollbar for content panels */
+        .custom-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f1f0; 
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #8c7b75; 
+            border-radius: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #5d4037; 
+        }
+
+        /* Tab Transition */
+        .tab-content {
+            transition: opacity 0.3s ease-in-out;
+        }
+        .active-tab {
+            border-bottom: 3px solid #78350f; /* amber-900 */
+            color: #78350f;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-[#f5f2eb] text-stone-800">
+
+    <!-- Chosen Palette: Ancient Scroll -->
+    <!-- Colors: Background (#f5f2eb - warm parchment), Primary (#78350f - deep leather/clay), Secondary (#a8a29e - stone), Accent (#b45309 - burnt orange/fire) -->
+
+    <!-- Application Structure Plan: 
+         1. Hero Section: Sets the stage with the "Weeping Prophet" persona and context.
+         2. Interactive Timeline: A Chart.js scatter/line combo to visualize the chaotic timeline of Jeremiah's ministry relative to the rise of Babylon. Goal: Establish 'When'.
+         3. The 70-Year Deep Dive: The core request. A dedicated section analyzing the "Why 70?" question (Sabbath years) and the "When?" (Start/End dates). Uses charts to visualize the math.
+         4. Symbolic Actions Gallery: Interactive cards explaining Jeremiah's physical prophecies (Yoke, Field, Linen Belt).
+         5. The Two Covenants: A comparative toggle view for Old vs. New Covenant (Jeremiah 31).
+         6. Synthesis/Takeaways: Summary of the key theological impacts.
+    -->
+
+    <!-- Visualization & Content Choices:
+         - Timeline Chart (Chart.js): Scatter plot to show distinct events (Carchemish, Siege, Fall) on a time axis. Allows users to grasp the duration of the decline.
+         - Sabbath Years Bar Chart (Chart.js): Visualizes the calculation of 490 years of disobedience resulting in 70 years of rest (2 Chron 36:21). Makes the math intuitive.
+         - Duration Scenarios (Chart.js): Floating bars to compare the two main theories of the 70 years (605-536 BC vs 586-516 BC).
+         - Interactive Cards: For symbols (Yoke, Figs), replacing static text to encourage exploration.
+         - NO SVG / NO Mermaid used. All visuals are Canvas or Tailwind-styled HTML.
+    -->
+
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Navigation -->
+    <nav class="bg-[#e7e5e4] border-b border-[#d6d3d1] sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-[#78350f] tracking-wider">JEREMIAH</span>
+                    <span class="ml-2 text-sm text-stone-600 hidden sm:block">| The Prophet of Exile</span>
+                </div>
+                <div class="flex items-center space-x-4 overflow-x-auto">
+                    <button onclick="scrollToSection('timeline')" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-[#d6d3d1] transition">Timeline</button>
+                    <button onclick="scrollToSection('prophecy')" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-[#d6d3d1] transition">The 70 Years</button>
+                    <button onclick="scrollToSection('symbols')" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-[#d6d3d1] transition">Symbols</button>
+                    <button onclick="scrollToSection('new-covenant')" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-[#d6d3d1] transition">New Covenant</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-[#292524] text-[#f5f2eb] py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-4xl sm:text-5xl font-bold mb-4">The Weeping Prophet & The 70 Years</h1>
+            <p class="text-xl sm:text-2xl font-light text-stone-300 mb-8">"For I know the plans I have for you..."</p>
+            <p class="text-lg max-w-2xl mx-auto leading-relaxed text-stone-400">
+                Jeremiah ministered during the final, tragic decades of Judah. His message was unpopular: 
+                <strong>Submit to Babylon to survive.</strong> Explore the historical context, the math behind the specific "70 Years" prophecy, and the hope embedded in the judgment.
+            </p>
+            <div class="mt-8">
+                <button onclick="scrollToSection('timeline')" class="bg-[#b45309] hover:bg-[#92400e] text-white font-bold py-3 px-8 rounded shadow-lg transition transform hover:-translate-y-1">
+                    Start the Journey
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+
+        <!-- Section 1: Historical Timeline -->
+        <section id="timeline" class="scroll-mt-20">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-[#78350f]">The Countdown to Destruction</h2>
+                <p class="mt-2 text-stone-600 max-w-2xl mx-auto">
+                    Jeremiah's ministry spanned the reigns of five kings. Use the interactive chart below to trace the decline of Jerusalem and pinpoint where Jeremiah warned the people. Click on points for details.
+                </p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-md border border-[#e7e5e4]">
+                <div class="chart-container">
+                    <canvas id="timelineChart"></canvas>
+                </div>
+                <div id="timeline-details" class="mt-6 p-4 bg-[#f5f2eb] border-l-4 border-[#b45309] rounded hidden">
+                    <h3 id="event-title" class="text-xl font-bold text-[#292524]">Event Title</h3>
+                    <p id="event-desc" class="mt-2 text-stone-700">Event description goes here.</p>
+                    <span id="event-ref" class="block mt-2 text-sm font-semibold text-[#b45309]"></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Deep Dive into the 70 Years -->
+        <section id="prophecy" class="scroll-mt-20">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Text Context -->
+                <div class="lg:col-span-1 space-y-6">
+                    <div>
+                        <h2 class="text-3xl font-bold text-[#78350f] mb-4">Why 70 Years?</h2>
+                        <p class="text-stone-700 leading-relaxed mb-4">
+                            Jeremiah was specific: The exile would not be brief (as false prophets claimed), nor forever. It would last exactly <strong>70 years</strong>.
+                        </p>
+                        <blockquote class="border-l-4 border-[#78350f] pl-4 italic text-stone-600 bg-stone-100 py-2 my-4 rounded-r">
+                            "This whole country will become a desolate wasteland, and these nations will serve the king of Babylon seventy years." 
+                            <br><span class="text-sm font-bold not-italic">- Jeremiah 25:11</span>
+                        </blockquote>
+                    </div>
+                    
+                    <div class="bg-white p-4 rounded shadow-sm border border-stone-200">
+                        <h3 class="text-lg font-bold text-[#b45309] mb-2">The Sabbath Hypothesis</h3>
+                        <p class="text-sm text-stone-600">
+                            According to 2 Chronicles 36:21, the land needed to enjoy its "Sabbath rests." 
+                            God commanded the land to lie fallow every 7th year. Israel disobeyed this for 490 years.
+                        </p>
+                        <ul class="mt-2 space-y-1 text-sm text-stone-700">
+                            <li>• <strong>490 Years</strong> of Disobedience</li>
+                            <li>• <strong>490 / 7 = 70</strong> Sabbath Years missed</li>
+                            <li>• <strong>70 Years</strong> of Exile to "pay back" the land.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Interactive Visualization -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Chart 1: The Mathematics of Rest -->
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-[#e7e5e4]">
+                        <h3 class="text-xl font-bold text-center mb-4 text-[#44403c]">The Math of Judgment (2 Chron 36:21)</h3>
+                        <div class="chart-container h-64">
+                            <canvas id="sabbathChart"></canvas>
+                        </div>
+                        <p class="text-center text-xs text-stone-500 mt-2">Visualizing the accumulation of missed Sabbath years owed to the land.</p>
+                    </div>
+
+                    <!-- Chart 2: The Timeline Scenarios -->
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-[#e7e5e4]">
+                        <h3 class="text-xl font-bold text-center mb-4 text-[#44403c]">Two Ways to Count the 70 Years</h3>
+                        <p class="text-sm text-stone-600 text-center mb-4">Scholars propose two timelines for the fulfillment. Both span roughly 70 years.</p>
+                        <div class="chart-container h-64">
+                            <canvas id="durationChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Prophetic Actions Gallery -->
+        <section id="symbols" class="bg-[#e7e5e4] -mx-4 sm:-mx-6 lg:-mx-8 py-12 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-[#78350f]">Living the Message</h2>
+                    <p class="mt-2 text-stone-700">Jeremiah didn't just speak; he performed dramatic "sign-acts" to visualize God's word. Click a card to reveal the meaning.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Card 1 -->
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer transform hover:scale-105 transition duration-300" onclick="toggleCard('card1')">
+                        <div class="h-40 bg-[#5d4037] flex items-center justify-center">
+                            <span class="text-6xl">🪵</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-stone-800 mb-2">The Wooden Yoke</h3>
+                            <p class="text-sm text-[#b45309] font-bold mb-2">Jeremiah 27</p>
+                            <div id="card1-short" class="block">
+                                <p class="text-stone-600 text-sm">Jeremiah wore an ox yoke around his neck in public...</p>
+                                <p class="text-xs text-stone-400 mt-2 italic">(Click to reveal meaning)</p>
+                            </div>
+                            <div id="card1-full" class="hidden">
+                                <p class="text-stone-700 text-sm"><strong>Meaning:</strong> Submission to Babylon is the only way to live. Those who fight the "yoke" of Nebuchadnezzar will be broken. Hananiah the false prophet broke the wooden yoke, so God promised an iron one.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer transform hover:scale-105 transition duration-300" onclick="toggleCard('card2')">
+                        <div class="h-40 bg-[#78350f] flex items-center justify-center">
+                            <span class="text-6xl">🏺</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-stone-800 mb-2">The Potter's House</h3>
+                            <p class="text-sm text-[#b45309] font-bold mb-2">Jeremiah 18</p>
+                            <div id="card2-short" class="block">
+                                <p class="text-stone-600 text-sm">He watched a potter spin clay. When a pot was marred, the potter reshaped it...</p>
+                                <p class="text-xs text-stone-400 mt-2 italic">(Click to reveal meaning)</p>
+                            </div>
+                            <div id="card2-full" class="hidden">
+                                <p class="text-stone-700 text-sm"><strong>Meaning:</strong> God has sovereignty over nations. If a nation repents, He can reshape it. If it does evil, He can destroy it. Israel was clay in His hands.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer transform hover:scale-105 transition duration-300" onclick="toggleCard('card3')">
+                        <div class="h-40 bg-[#a8a29e] flex items-center justify-center">
+                            <span class="text-6xl">🧺</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-stone-800 mb-2">Good & Bad Figs</h3>
+                            <p class="text-sm text-[#b45309] font-bold mb-2">Jeremiah 24</p>
+                            <div id="card3-short" class="block">
+                                <p class="text-stone-600 text-sm">Two baskets of figs placed before the temple. One ripe, one rotten...</p>
+                                <p class="text-xs text-stone-400 mt-2 italic">(Click to reveal meaning)</p>
+                            </div>
+                            <div id="card3-full" class="hidden">
+                                <p class="text-stone-700 text-sm"><strong>Meaning:</strong> Counter-intuitively, the "Good Figs" were the exiles taken to Babylon (God would protect them). The "Bad Figs" were those who stayed in Jerusalem to fight (they would be destroyed).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer transform hover:scale-105 transition duration-300" onclick="toggleCard('card4')">
+                        <div class="h-40 bg-[#b45309] flex items-center justify-center">
+                            <span class="text-6xl">📜</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-stone-800 mb-2">Buying the Field</h3>
+                            <p class="text-sm text-[#78350f] font-bold mb-2">Jeremiah 32</p>
+                            <div id="card4-short" class="block">
+                                <p class="text-stone-600 text-sm">While in prison and Jerusalem under siege, he bought real estate...</p>
+                                <p class="text-xs text-stone-400 mt-2 italic">(Click to reveal meaning)</p>
+                            </div>
+                            <div id="card4-full" class="hidden">
+                                <p class="text-stone-700 text-sm"><strong>Meaning:</strong> An ultimate act of hope. Buying land while the enemy was at the gates proved his faith that God would one day bring the people back to the land.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: The New Covenant -->
+        <section id="new-covenant" class="scroll-mt-20 mb-20">
+            <div class="bg-white rounded-xl shadow-xl overflow-hidden border border-[#d6d3d1]">
+                <div class="bg-[#292524] p-6 text-center">
+                    <h2 class="text-3xl font-bold text-[#f5f2eb]">The Book of Consolation</h2>
+                    <p class="text-stone-400 mt-2">Jeremiah 31:31-34</p>
+                </div>
+                
+                <div class="p-8">
+                    <p class="text-center text-lg text-stone-700 mb-8 max-w-3xl mx-auto">
+                        Amidst the doom, Jeremiah delivers the most significant theological promise in the Old Testament: The New Covenant. Explore the difference below.
+                    </p>
+
+                    <div class="flex justify-center mb-6 space-x-4">
+                        <button id="btn-old" onclick="setCovenant('old')" class="px-6 py-2 rounded-full border-2 border-[#78350f] font-bold text-[#78350f] active-tab">The Old Covenant</button>
+                        <button id="btn-new" onclick="setCovenant('new')" class="px-6 py-2 rounded-full border-2 border-transparent text-stone-500 hover:text-[#78350f] hover:bg-stone-100 transition">The New Covenant</button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-[#fafaf9] p-6 rounded-lg">
+                        <div class="text-center md:text-right space-y-4">
+                            <div id="cov-icon" class="text-6xl">🗿</div>
+                            <h3 id="cov-title" class="text-2xl font-bold text-[#292524]">Written on Stone</h3>
+                        </div>
+                        <div class="border-l-4 border-[#b45309] pl-6">
+                            <p id="cov-desc" class="text-lg text-stone-700 italic">
+                                "The covenant I made with their ancestors when I took them by the hand to lead them out of Egypt, because they broke my covenant, though I was a husband to them."
+                            </p>
+                            <ul id="cov-list" class="mt-4 space-y-2 text-stone-600 text-sm">
+                                <li>• External Law (Ten Commandments)</li>
+                                <li>• Requires continual animal sacrifice</li>
+                                <li>• Depends on human obedience (which failed)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-[#292524] text-stone-400 py-8 text-center border-t border-[#44403c]">
+        <div class="max-w-7xl mx-auto px-4">
+            <p class="mb-2">"For I know the plans I have for you,” declares the Lord, “plans to prosper you and not to harm you, plans to give you hope and a future."</p>
+            <p class="text-sm font-mono text-[#b45309]">- Jeremiah 29:11</p>
+            <div class="mt-8 text-xs text-stone-600">
+                Interactive Study Tool created based on the Book of Jeremiah.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- State & Data ---
+
+        // 1. Timeline Data
+        const timelineData = [
+            { x: -627, y: 1, title: "Jeremiah's Call", desc: "Jeremiah is called as a youth in the 13th year of Josiah. Assyria is weakening; Babylon is rising.", ref: "Jeremiah 1" },
+            { x: -609, y: 2, title: "Death of Josiah", desc: "Good King Josiah is killed at Megiddo. The spiritual decline of Judah accelerates immediately.", ref: "2 Kings 23" },
+            { x: -605, y: 5, title: "Battle of Carchemish", desc: "Babylon defeats Egypt. Nebuchadnezzar becomes master of the Near East. *First deportation of exiles (including Daniel).* Start of 70 years?", ref: "Jeremiah 46" },
+            { x: -597, y: 6, title: "The Second Exile", desc: "Jerusalem surrenders. King Jehoiachin and Ezekiel are taken to Babylon along with 10,000 leaders/craftsmen.", ref: "2 Kings 24" },
+            { x: -594, y: 4, title: "The Yoke Sermon", desc: "Jeremiah wears a yoke to warn kings not to revolt against Babylon. Hananiah breaks it.", ref: "Jeremiah 27-28" },
+            { x: -588, y: 7, title: "The Siege Begins", desc: "Zedekiah rebels. Babylon lays siege to Jerusalem. Jeremiah buys a field to show hope for the future.", ref: "Jeremiah 32" },
+            { x: -586, y: 10, title: "Fall of Jerusalem", desc: "The City and Temple are destroyed. Zedekiah blinded. The 70 years of desolation begin officially for the land.", ref: "Jeremiah 52" },
+            { x: -539, y: 3, title: "Fall of Babylon", desc: "Cyrus the Great (Persia) conquers Babylon, fulfilling Jeremiah's prophecy of Babylon's doom.", ref: "Jeremiah 50-51" },
+            { x: -536, y: 0, title: "The Return", desc: "Cyrus issues decree allowing Jews to return and rebuild. 70 years from 605 BC (approx).", ref: "Ezra 1" }
+        ];
+
+        // 2. Covenant Data
+        const covenantContent = {
+            old: {
+                icon: "🗿",
+                title: "Written on Stone",
+                desc: "\"The covenant I made with their ancestors when I took them by the hand to lead them out of Egypt, because they broke my covenant, though I was a husband to them.\"",
+                list: [
+                    "• External Law (Ten Commandments)",
+                    "• Requires continual animal sacrifice",
+                    "• Depends on human obedience (which failed)",
+                    "• Relationship mediated by priests"
+                ]
+            },
+            new: {
+                icon: "❤️",
+                title: "Written on the Heart",
+                desc: "\"I will put my law in their minds and write it on their hearts. I will be their God, and they will be my people.\"",
+                list: [
+                    "• Internal transformation (The Spirit)",
+                    "• Total forgiveness of wickedness",
+                    "• Personal knowledge of God (no mediator needed)",
+                    "• Unbreakable by God"
+                ]
+            }
+        };
+
+        // --- Chart Initialization ---
+
+        // Chart 1: Timeline Scatter
+        const ctxTimeline = document.getElementById('timelineChart').getContext('2d');
+        const timelineChart = new Chart(ctxTimeline, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Intensity of Conflict/Event',
+                    data: timelineData,
+                    backgroundColor: '#b45309',
+                    borderColor: '#78350f',
+                    pointRadius: 8,
+                    pointHoverRadius: 12,
+                    showLine: true,
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.raw.title + ' (' + Math.abs(context.raw.x) + ' BC)';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Year (BC)' },
+                        min: -640,
+                        max: -530,
+                        ticks: {
+                            callback: function(value) { return Math.abs(value) + ' BC'; }
+                        }
+                    },
+                    y: {
+                        display: false,
+                        min: -1,
+                        max: 12
+                    }
+                },
+                onClick: (e, elements) => {
+                    if (elements.length > 0) {
+                        const index = elements[0].index;
+                        updateTimelineDetails(timelineData[index]);
+                    }
+                }
+            }
+        });
+
+        // Chart 2: Sabbath Math (Bar)
+        const ctxSabbath = document.getElementById('sabbathChart').getContext('2d');
+        new Chart(ctxSabbath, {
+            type: 'bar',
+            data: {
+                labels: ['Years of Disobedience', 'Sabbath Years Owed'],
+                datasets: [{
+                    label: 'Years',
+                    data: [490, 70],
+                    backgroundColor: ['#292524', '#b45309'],
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            afterLabel: function(context) {
+                                if (context.dataIndex === 0) return "Israel ignored Sabbath laws for 490 years.";
+                                return "490 / 7 = 70 Years of enforced rest.";
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Chart 3: Duration Scenarios (Floating Bar)
+        const ctxDuration = document.getElementById('durationChart').getContext('2d');
+        new Chart(ctxDuration, {
+            type: 'bar',
+            data: {
+                labels: ['Political Exile (Daniel)', 'Temple Desolation (Zechariah)'],
+                datasets: [{
+                    label: 'Duration',
+                    data: [
+                        [605, 536], // Start, End (Absolute values for viz, labels handled manually)
+                        [586, 516]
+                    ],
+                    backgroundColor: '#78350f',
+                    borderRadius: 5,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                scales: {
+                    x: {
+                        min: 500,
+                        max: 620,
+                        reverse: true, // BC dates go down
+                        title: { display: true, text: 'Years BC' }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const raw = context.raw;
+                                return `${raw[0]} BC - ${raw[1]} BC (~70 Years)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // --- Interaction Logic ---
+
+        function updateTimelineDetails(data) {
+            const detailPanel = document.getElementById('timeline-details');
+            document.getElementById('event-title').innerText = data.title + ` (${Math.abs(data.x)} BC)`;
+            document.getElementById('event-desc').innerText = data.desc;
+            document.getElementById('event-ref').innerText = "Read: " + data.ref;
+            detailPanel.classList.remove('hidden');
+            detailPanel.classList.add('block');
+        }
+
+        function toggleCard(cardId) {
+            const short = document.getElementById(cardId + '-short');
+            const full = document.getElementById(cardId + '-full');
+            
+            if (short.classList.contains('block')) {
+                short.classList.remove('block');
+                short.classList.add('hidden');
+                full.classList.remove('hidden');
+                full.classList.add('block');
+            } else {
+                full.classList.remove('block');
+                full.classList.add('hidden');
+                short.classList.remove('hidden');
+                short.classList.add('block');
+            }
+        }
+
+        function setCovenant(type) {
+            const data = covenantContent[type];
+            const btnOld = document.getElementById('btn-old');
+            const btnNew = document.getElementById('btn-new');
+            
+            // Update UI State
+            if (type === 'old') {
+                btnOld.classList.add('active-tab', 'border-[#78350f]', 'text-[#78350f]');
+                btnOld.classList.remove('border-transparent', 'text-stone-500');
+                btnNew.classList.remove('active-tab', 'border-[#78350f]', 'text-[#78350f]');
+                btnNew.classList.add('border-transparent', 'text-stone-500');
+            } else {
+                btnNew.classList.add('active-tab', 'border-[#78350f]', 'text-[#78350f]');
+                btnNew.classList.remove('border-transparent', 'text-stone-500');
+                btnOld.classList.remove('active-tab', 'border-[#78350f]', 'text-[#78350f]');
+                btnOld.classList.add('border-transparent', 'text-stone-500');
+            }
+
+            // Update Content
+            document.getElementById('cov-icon').innerText = data.icon;
+            document.getElementById('cov-title').innerText = data.title;
+            document.getElementById('cov-desc').innerText = data.desc;
+            
+            const listContainer = document.getElementById('cov-list');
+            listContainer.innerHTML = '';
+            data.list.forEach(item => {
+                const li = document.createElement('li');
+                li.innerText = item;
+                listContainer.appendChild(li);
+            });
+        }
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Initialize with first timeline event visible
+        updateTimelineDetails(timelineData[2]); // Default to Carchemish (Start of exile)
+
+    </script>
+</body>
+</html>
